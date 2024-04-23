@@ -29,12 +29,10 @@ def detect_plate(populate_history):
     while True:
         ret, img = vid.read()
         
-        if ret == True:
         
-        
-            # Press Q on keyboard to  exit
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                break
+        # Press Q on keyboard to  exit
+        if cv2.waitKey(25) & 0xFF == ord('q'):
+            break
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         bfilter = cv2.bilateralFilter(gray, 11, 11, 17)
         edged = cv2.Canny(bfilter, 30, 200)
