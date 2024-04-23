@@ -5,9 +5,16 @@ import multiprocessing as mp
 import time
 import serial
 import sqlite3
+from datetime import datetime
 
 ser = serial.serial_for_url('rfc2217://localhost:4000', baudrate=115200)
-
+def insert_history_record(plate_number, name, phone):
+    conn = sqlite3.connect('history.db')
+    c = conn.cursor()
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    c.execute("INSERT INTO history_table (plate_number, Name, Phone, timestamp) VALUES (?, ?, ?, ?)", (plate_number, name, phone, timestamp))
+    conn.commit()
+    conn.close()
 def fetch_record_by_plate_number(plate_number):
     conn = sqlite3.connect('license_plates.db')
     c = conn.cursor()
@@ -16,7 +23,7 @@ def fetch_record_by_plate_number(plate_number):
     conn.close()
     return record
 
-def detect_plate():
+def detect_plate(populate_history):
     vid = cv2.VideoCapture(0)
 
     while True:
@@ -44,6 +51,7 @@ def detect_plate():
                 break
 
         if location is not None:
+
             mask = np.zeros(gray.shape, np.uint8)
             cv2.drawContours(mask, [location], 0, 255, -1)
 
@@ -54,7 +62,9 @@ def detect_plate():
             (x2, y2) = (np.max(x), np.max(y))
             cropped_image = gray[x1:x2+4, y1:y2+4]
             # Display the resulting frame
-            cv2.imshow('Frame',cropped_image)
+            cv2.rectangle(img, (y1, x1), (y2+4, x2+4), (0, 255, 0), 3)
+
+            cv2.imshow('Frame',img)
 
             reader = easyocr.Reader(['en'])
             result = reader.readtext(cropped_image)
@@ -77,5 +87,8 @@ def detect_plate():
                         if (type == "Teacher"): 
                             Type = b'3'
                         print('Found ', Type)
+                        insert_history_record(Res[0][0], Res[0][1], Res[0][2])
+                        populate_history()
                         ser.write(Type)
+
                         time.sleep(5) 

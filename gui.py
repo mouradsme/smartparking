@@ -8,13 +8,26 @@ import serial
 
 ser = serial.serial_for_url('rfc2217://localhost:4000', baudrate=115200)
 
-# Insert data into SQLite database
-conn = sqlite3.connect('license_plates.db')
-c = conn.cursor()
-c.execute('''CREATE TABLE IF NOT EXISTS license_plates
-                (plate_number TEXT UNIQUE, name TEXT, phone TEXT, category TEXT)''')
-conn.commit()
-conn.close()
+def create_history_table():
+    hConn = sqlite3.connect('history.db')
+    h = hConn.cursor()
+    h.execute('''CREATE TABLE IF NOT EXISTS history_table
+                 (plate_number TEXT, Name TEXT, Phone TEXT, timestamp DATETIME)''')
+    hConn.commit()
+    hConn.close()
+
+def create_main_table():
+    conn = sqlite3.connect('license_plates.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS license_plates
+                    (plate_number TEXT UNIQUE, name TEXT, phone TEXT, category TEXT)''')
+    conn.commit()
+    conn.close()
+
+
+create_main_table()
+create_history_table()
+
 # Function to add a new license plate record to the database
 def add_license_plate():
     # Retrieve data from entry widgets
@@ -44,6 +57,28 @@ def add_license_plate():
     phone_entry.delete(0, tk.END)
     category_combobox.set('')  # Reset combobox selection
 
+
+# Function to populate the history tab with records
+
+def populate_history():
+    # Clear existing rows in the treeview
+    for row in history_tree.get_children():
+        history_tree.delete(row)
+
+    # Connect to SQLite database
+    conn = sqlite3.connect('history.db')
+    c = conn.cursor()
+
+    # Fetch data from database
+    c.execute("SELECT plate_number, Name, Phone, timestamp FROM history_table")
+    rows = c.fetchall()
+
+    # Insert data into treeview
+    for row in rows:
+        history_tree.insert('', 'end', values=row)
+
+    # Close database connection
+    conn.close()
 
 # Function to populate the license plates tab with records
 def populate_license_plates():
@@ -89,7 +124,8 @@ def captured():
 
 # Function to detect license plates
 def detect_plates():
-    camera.detect_plate()
+    camera.detect_plate(populate_history)
+    
 # Create main window
 root = tk.Tk()
 root.title("License Plate Manager")
@@ -166,7 +202,6 @@ add_button.grid(row=5, column=1, sticky=tk.E)
 
 detect_button = ttk.Button(add_tab, text="Capture Plate", command=captured)
 detect_button.grid(row=4, column=1, sticky=tk.E)
-# Start the Tkinter event loop
 
 # Tab 3: Detection
 detection_tab = ttk.Frame(notebook)
@@ -179,8 +214,19 @@ detection_label.grid(row=0, column=0, padx=10, pady=10)
 detect_button = ttk.Button(detection_tab, text="Detect Plates", command=detect_plates)
 detect_button.grid(row=1, column=0, padx=10, pady=10)
 
+# Tab 4: History
+history_tab = ttk.Frame(notebook)
+notebook.add(history_tab, text='History')
 
+# Create Treeview for displaying history records
+history_tree = ttk.Treeview(history_tab, columns=('Plate Number', 'Name', 'Phone', 'Timestamp'), show='headings')
+history_tree.heading('Plate Number', text='Plate Number')
+history_tree.heading('Name', text='Name')
+history_tree.heading('Phone', text='Phone')
+history_tree.heading('Timestamp', text='Timestamp')
+history_tree.pack(fill='both', expand=True)
 
 
 populate_license_plates()
+populate_history()
 root.mainloop()
