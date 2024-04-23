@@ -4,6 +4,9 @@ from tkinter import messagebox
 import detect
 import camera
 import sqlite3
+import serial
+
+ser = serial.serial_for_url('rfc2217://localhost:4000', baudrate=115200)
 
 # Insert data into SQLite database
 conn = sqlite3.connect('license_plates.db')
@@ -86,14 +89,7 @@ def captured():
 
 # Function to detect license plates
 def detect_plates():
-    detected_plate_number = camera.detect_plate()
-    if detected_plate_number:
-        detection_result_entry.configure(state='normal')
-        detection_result_entry.delete(0, tk.END)
-        detection_result_entry.insert(0, detected_plate_number)
-        detection_result_entry.configure(state='readonly')
-    else:
-        messagebox.showinfo("No Plate Detected", "No license plate detected in the image.")
+    camera.detect_plate()
 # Create main window
 root = tk.Tk()
 root.title("License Plate Manager")
@@ -182,12 +178,6 @@ detection_label.grid(row=0, column=0, padx=10, pady=10)
 
 detect_button = ttk.Button(detection_tab, text="Detect Plates", command=detect_plates)
 detect_button.grid(row=1, column=0, padx=10, pady=10)
-
-detection_result_label = ttk.Label(detection_tab, text="Detected Plate Number:")
-detection_result_label.grid(row=2, column=0, padx=10, pady=10)
-
-detection_result_entry = ttk.Entry(detection_tab, width=30, state='readonly')
-detection_result_entry.grid(row=3, column=0, padx=10, pady=10)
 
 
 
