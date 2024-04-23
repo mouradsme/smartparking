@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "author": "Mourad Bousserouel",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": -220.2, "left": -135, "attrs": {} },
+    { "type": "wokwi-servo", "id": "servo1", "top": -280.4, "left": 336, "attrs": {} },
+    { "type": "wokwi-servo", "id": "servo2", "top": -184.4, "left": 336, "attrs": {} },
+    { "type": "wokwi-servo", "id": "servo3", "top": -88.4, "left": 336, "attrs": {} }
+  ],
+  "connections": [
+    [ "servo3:GND", "uno:GND.1", "black", [ "h0" ] ],
+    [ "servo1:GND", "uno:GND.1", "black", [ "h0" ] ],
+    [ "servo2:GND", "uno:GND.1", "black", [ "h0" ] ],
+    [ "servo3:PWM", "uno:8", "green", [ "h0" ] ],
+    [ "servo2:PWM", "uno:9", "green", [ "h0" ] ],
+    [ "servo1:PWM", "uno:10", "green", [ "h0" ] ],
+    [ "servo3:V+", "uno:5V", "green", [ "h-144", "v220.9" ] ],
+    [ "servo2:V+", "uno:5V", "green", [ "h0" ] ],
+    [ "servo1:V+", "uno:5V", "green", [ "h0" ] ]
+  ],
+  "dependencies": {}
+}
