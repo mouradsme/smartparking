@@ -125,48 +125,7 @@ def captured():
 # Function to detect license plates
 def detect_plates():
     camera.detect_plate(populate_history)
-# Function to search history records
-def search_history():
-    # Get search criteria from entry widgets
-    plate_query = plate_search_entry.get().strip()
-    name_query = name_search_entry.get().strip()
-    phone_query = phone_search_entry.get().strip()
-
-    # Clear existing rows in the treeview
-    for row in history_tree.get_children():
-        history_tree.delete(row)
-
-    # Connect to SQLite database
-    conn = sqlite3.connect('history.db')
-    c = conn.cursor()
-
-    # Construct SQL query based on search criteria
-    query = "SELECT plate_number, Name, Phone, timestamp FROM history_table WHERE "
-    conditions = []
-    if plate_query:
-        conditions.append(f"plate_number LIKE '%{plate_query}%'")
-    if name_query:
-        conditions.append(f"Name LIKE '%{name_query}%'")
-    if phone_query:
-        conditions.append(f"Phone LIKE '%{phone_query}%'")
-
-    if conditions:
-        query += " AND ".join(conditions)
-    else:
-        query += "1"  # Add dummy condition to avoid syntax error
-
-    # Fetch data from database based on search query
-    c.execute(query)
-    rows = c.fetchall()
-
-    # Insert filtered data into treeview
-    for row in rows:
-        history_tree.insert('', 'end', values=row)
-
-    # Close database connection
-    conn.close()
-
-
+    
 # Create main window
 root = tk.Tk()
 root.title("License Plate Manager")
@@ -268,28 +227,6 @@ history_tree.heading('Timestamp', text='Timestamp')
 history_tree.pack(fill='both', expand=True)
 
 
-# Create entry widgets for search queries
-# Create entry widgets for search queries
-plate_search_label = ttk.Label(history_tab, text="Search by License Plate:")
-plate_search_label.pack(side=tk.LEFT, padx=5)
-
-plate_search_entry = ttk.Entry(history_tab, width=20)
-plate_search_entry.pack(side=tk.LEFT, padx=5)
-
-name_search_label = ttk.Label(history_tab, text="Search by Name:")
-name_search_label.pack(side=tk.LEFT, padx=5)
-
-name_search_entry = ttk.Entry(history_tab, width=20)
-name_search_entry.pack(side=tk.LEFT, padx=5)
-
-phone_search_label = ttk.Label(history_tab, text="Search by Phone:")
-phone_search_label.pack(side=tk.LEFT, padx=5)
-
-phone_search_entry = ttk.Entry(history_tab, width=20)
-phone_search_entry.pack(side=tk.LEFT, padx=5)
-# Button to trigger search
-search_button = ttk.Button(history_tab, text="Search", command=search_history)
-search_button.pack(side=tk.LEFT, padx=10)
 populate_license_plates()
 populate_history()
 root.mainloop()
