@@ -8,11 +8,11 @@ import sqlite3
 from datetime import datetime
 
 ser = serial.serial_for_url('rfc2217://localhost:4000', baudrate=115200)
-def insert_history_record(plate_number, name, phone):
+def insert_history_record(plate_number, name, phone, role):
     conn = sqlite3.connect('history.db')
     c = conn.cursor()
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    c.execute("INSERT INTO history_table (plate_number, Name, Phone, timestamp) VALUES (?, ?, ?, ?)", (plate_number, name, phone, timestamp))
+    c.execute("INSERT INTO history_table (plate_number, Name, Phone, Role, timestamp) VALUES (?, ?, ?, ?, ?)", (plate_number, name, phone, role, timestamp))
     conn.commit()
     conn.close()
 def fetch_record_by_plate_number(plate_number):
@@ -85,7 +85,7 @@ def detect_plate(populate_history):
                         if (type == "Teacher"): 
                             Type = b'3'
                         print('Found ', Type)
-                        insert_history_record(Res[0][0], Res[0][1], Res[0][2])
+                        insert_history_record(Res[0][0], Res[0][1], Res[0][2], Res[0][3])
                         populate_history()
                         ser.write(Type)
 

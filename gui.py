@@ -12,7 +12,7 @@ def create_history_table():
     hConn = sqlite3.connect('history.db')
     h = hConn.cursor()
     h.execute('''CREATE TABLE IF NOT EXISTS history_table
-                 (plate_number TEXT, Name TEXT, Phone TEXT, timestamp DATETIME)''')
+                 (plate_number TEXT, Name TEXT, Phone TEXT, Role TEXT, timestamp DATETIME)''')
     hConn.commit()
     hConn.close()
 
@@ -70,7 +70,7 @@ def populate_history():
     c = conn.cursor()
 
     # Fetch data from database
-    c.execute("SELECT plate_number, Name, Phone, timestamp FROM history_table")
+    c.execute("SELECT plate_number, Name, Phone, Role, timestamp FROM history_table")
     rows = c.fetchall()
 
     # Insert data into treeview
@@ -260,10 +260,11 @@ history_tab = ttk.Frame(notebook)
 notebook.add(history_tab, text='History')
 
 # Create Treeview for displaying history records
-history_tree = ttk.Treeview(history_tab, columns=('Plate Number', 'Name', 'Phone', 'Timestamp'), show='headings')
+history_tree = ttk.Treeview(history_tab, columns=('Plate Number', 'Name', 'Phone', 'Role', 'Timestamp'), show='headings')
 history_tree.heading('Plate Number', text='Plate Number')
 history_tree.heading('Name', text='Name')
 history_tree.heading('Phone', text='Phone')
+history_tree.heading('Role', text='Role')
 history_tree.heading('Timestamp', text='Timestamp')
 history_tree.pack(fill='both', expand=True)
 
